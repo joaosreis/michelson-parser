@@ -35,5 +35,5 @@ build: [
 ]
 dev-repo: "git+https://github.com/joaosreis/michelson-parser.git"
 pin-depends: [
-    "michelson-adt.dev" "git+https://github.com/joaosreis/michelson-adt.git"
+    ["michelson-adt.dev" "git+https://github.com/joaosreis/michelson-adt#df350569c3f02146f2a4afaf613118252042c60b"]
 ]
