@@ -24,11 +24,14 @@
  (depends
   (dune :build)
   (core
-   (>= 0.15))
+   (and
+    (>= v0.15)
+    (< v0.16)))
   (core_unix
    (and
     :with-test
-    (>= 0.15)))
+    (>= v0.15)
+    (< v0.16)))
   michelson-adt
   (tezos-micheline
    (>= 7.0))
