@@ -9,8 +9,8 @@ homepage: "https://github.com/joaosreis/michelson-parser"
 bug-reports: "https://github.com/joaosreis/michelson-parser/issues"
 depends: [
   "dune" {>= "2.8" & build}
-  "core" {>= "0.15"}
-  "core_unix" {with-test & >= "0.15"}
+  "core" {>= "v0.15" & < "v0.16"}
+  "core_unix" {with-test & >= "v0.15" & < "v0.16"}
   "michelson-adt"
   "tezos-micheline" {>= "7.0"}
   "ppx_deriving"
@@ -35,5 +35,5 @@ build: [
 ]
 dev-repo: "git+https://github.com/joaosreis/michelson-parser.git"
 pin-depends: [
-    ["michelson-adt.dev" "git+https://github.com/joaosreis/michelson-adt#3ca3bfd6ddc138a7da6ed468339e5457b265a64f"]
+    ["michelson-adt.dev" "git+https://github.com/joaosreis/michelson-adt#14d8856fbb06b08933122f63fdfcdf8c283333bd"]
 ]
