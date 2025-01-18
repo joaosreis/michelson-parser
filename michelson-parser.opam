@@ -9,8 +9,8 @@ homepage: "https://github.com/joaosreis/michelson-parser"
 bug-reports: "https://github.com/joaosreis/michelson-parser/issues"
 depends: [
   "dune" {>= "2.8" & build}
-  "core" {>= "v0.15" & < "v0.16"}
-  "core_unix" {with-test & >= "v0.15" & < "v0.16"}
+  "core" {>= "v0.14" & < "v0.15"}
+  "core_unix" {with-test & >= "v0.14" & < "v0.15"}
   "michelson-adt"
   "tezos-micheline"
   "ppx_deriving"

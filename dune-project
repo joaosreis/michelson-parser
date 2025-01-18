@@ -25,13 +25,13 @@
   (dune :build)
   (core
    (and
-    (>= v0.15)
-    (< v0.16)))
+    (>= v0.14)
+    (< v0.15)))
   (core_unix
    (and
     :with-test
-    (>= v0.15)
-    (< v0.16)))
+    (>= v0.14)
+    (< v0.15)))
   michelson-adt
   tezos-micheline
   ppx_deriving
