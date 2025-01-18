@@ -12,9 +12,9 @@ depends: [
   "core" {>= "v0.15" & < "v0.16"}
   "core_unix" {with-test & >= "v0.15" & < "v0.16"}
   "michelson-adt"
-  "tezos-micheline" {>= "7.0"}
+  "tezos-micheline"
   "ppx_deriving"
-  "pp_loc" {>= "2.0"}
+  "pp_loc"
   "bisect_ppx" {with-test & >= "2.5.0"}
   "alcotest" {with-test}
   "odoc" {with-doc}

@@ -33,11 +33,9 @@
     (>= v0.15)
     (< v0.16)))
   michelson-adt
-  (tezos-micheline
-   (>= 7.0))
+  tezos-micheline
   ppx_deriving
-  (pp_loc
-   (>= 2.0))
+  pp_loc
   (bisect_ppx
    (and
     :with-test
