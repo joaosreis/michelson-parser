@@ -28,12 +28,12 @@
           on.buildOpamProject { resolveArgs.with-test = true; } package ./.
           query;
         overlay = final: prev: {
-            # Your overrides go here
+          # Your overrides go here
           ocaml-lsp-server = prev.ocaml-lsp-server.overrideAttrs {
             nativeBuildInputs = prev.ocaml-lsp-server.nativeBuildInputs
               ++ [ prev.cppo ];
           };
-          };
+        };
         scope' = scope.overrideScope overlay;
         # The main package containing the executable
         main = scope'.${package};
@@ -49,6 +49,7 @@
           inputsFrom = [ main ];
           buildInputs = devPackages ++ [
             pkgs.nixd
+            pkgs.nixfmt
             # You can add packages from nixpkgs here
           ];
         };
