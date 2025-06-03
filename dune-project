@@ -23,15 +23,14 @@
  (synopsis "An OCaml library to parse Michelson smart contracts")
  (depends
   (dune :build)
-  (core
+  (containers
    (and
-    (>= v0.14)
-    (< v0.15)))
-  (core_unix
+    (>= 3.0)
+    (< 4.0)))
+  (zarith
    (and
-    :with-test
-    (>= v0.14)
-    (< v0.15)))
+    (>= 1.0)
+    (< 2.0)))
   michelson-adt
   tezos-micheline
   ppx_deriving

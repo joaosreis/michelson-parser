@@ -1,3 +1,3 @@
 pin-depends: [
-    ["michelson-adt.dev" "git+https://github.com/joaosreis/michelson-adt#36d8f738406ed7e64ae8642bc98dbe64b31df4aa"]
+    ["michelson-adt.dev" "git+https://github.com/joaosreis/michelson-adt#d7773c84df886a39c0a46f01bda8f2a4b974dcb3"]
 ]
