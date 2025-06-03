@@ -5,8 +5,8 @@
   common_parser
   michelson-adt.edo
   tezos-micheline
-  core
-  bignum
+  containers
+  zarith
   pp_loc)
  (inline_tests)
  (preprocess

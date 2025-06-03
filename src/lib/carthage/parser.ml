@@ -40,13 +40,11 @@ let rec convert filename ast =
     | _ -> assert false
   in
 
-  let bigint_of_z n = Bigint.of_zarith_bigint n in
-
   let rec data (_, typ, _) token =
     let t =
       let open Micheline in
       match token with
-      | Int (_, n) -> D_int (bigint_of_z n)
+      | Int (_, n) -> D_int n
       | String (_, s) -> D_string s
       | Bytes (_, b) -> D_bytes b
       | Prim (_, "Unit", [], _) -> D_unit
@@ -97,15 +95,15 @@ let rec convert filename ast =
       | Prim (_, "LOOP", [ b ], _) -> I_loop (inst b)
       | Prim (_, "LOOP_LEFT", [ b ], _) -> I_loop_left (inst b)
       | Prim (_, "DIP", [ b ], _) -> I_dip (inst b)
-      | Prim (_, "DIP", [ Int (_, n); b ], _) -> I_dip_n (bigint_of_z n, inst b)
+      | Prim (_, "DIP", [ Int (_, n); b ], _) -> I_dip_n (n, inst b)
       | Prim (_, "EXEC", [], _) -> I_exec
       | Prim (_, "APPLY", [], _) -> I_apply
       | Prim (_, "DROP", [], _) -> I_drop
-      | Prim (_, "DROP", [ Int (_, n) ], _) -> I_drop_n (bigint_of_z n)
+      | Prim (_, "DROP", [ Int (_, n) ], _) -> I_drop_n n
       | Prim (_, "DUP", [], _) -> I_dup
       | Prim (_, "SWAP", [], _) -> I_swap
-      | Prim (_, "DIG", [ Int (_, n) ], _) -> I_dig (bigint_of_z n)
-      | Prim (_, "DUG", [ Int (_, n) ], _) -> I_dug (bigint_of_z n)
+      | Prim (_, "DIG", [ Int (_, n) ], _) -> I_dig n
+      | Prim (_, "DUG", [ Int (_, n) ], _) -> I_dug n
       | Prim (_, "PUSH", [ t; d ], _) ->
           let t = typ t in
           I_push (t, data t d)

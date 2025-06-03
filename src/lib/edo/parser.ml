@@ -1,4 +1,4 @@
-open! Core
+open! Containers
 open Tezos_micheline
 open Edo_adt
 open Common_adt
@@ -49,9 +49,8 @@ let rec convert filename ast =
       | Prim (_, "bls12_381_g2", _, _) -> T_bls12_381_g2
       | Prim (_, "bls12_381_fr", _, _) -> T_bls12_381_fr
       | Prim (_, "sapling_transaction", [ Int (_, n) ], _) ->
-          T_sapling_transaction (Bigint.of_zarith_bigint n)
-      | Prim (_, "sapling_state", [ Int (_, n) ], _) ->
-          T_sapling_state (Bigint.of_zarith_bigint n)
+          T_sapling_transaction n
+      | Prim (_, "sapling_state", [ Int (_, n) ], _) -> T_sapling_state n
       | _ ->
           error Format.str_formatter filename token;
           failwith (Format.flush_str_formatter ())
@@ -60,11 +59,9 @@ let rec convert filename ast =
     | Prim (_, _, _, l) ->
         create
           ~location:(token_location filename token)
-          (t, List.map l ~f:get_annot)
+          (t, List.map get_annot l)
     | _ -> assert false
   in
-
-  let bigint_of_z n = Bigint.of_zarith_bigint n in
 
   let rec data ({ Node.value = typ, _; _ } as t) token =
     let open Micheline in
@@ -73,7 +70,7 @@ let rec convert filename ast =
       create ~location:(token_location filename token)
     in
     match token with
-    | Int (_, n) -> create (D_int (bigint_of_z n))
+    | Int (_, n) -> create (D_int n)
     | String (_, s) -> create (D_string s)
     | Bytes (_, b) -> create (D_bytes b)
     | Prim (_, "Unit", [], _) -> create D_unit
@@ -112,7 +109,7 @@ let rec convert filename ast =
         | _ -> assert false)
     | Seq (_, l) -> (
         match typ with
-        | T_list t | T_set t -> create (D_list (List.map l ~f:(data t)))
+        | T_list t | T_set t -> create (D_list (List.map (data t) l))
         | T_map (t_1, t_2) | T_big_map (t_1, t_2) ->
             let data_elt typ_1 typ_2 token =
               let open Micheline in
@@ -122,7 +119,7 @@ let rec convert filename ast =
                   create ~token (D_elt (data typ_1 d_1, data typ_2 d_2))
               | _ -> assert false
             in
-            create (D_list (List.map l ~f:(data_elt t_1 t_2)))
+            create (D_list (List.map (data_elt t_1 t_2) l))
         | T_lambda _ -> create (D_instruction (inst token))
         | T_pair _ ->
             let rec data_pair_n t l =
@@ -142,24 +139,22 @@ let rec convert filename ast =
       let open Micheline in
       let open Adt in
       match token with
-      | Seq (_, l) -> I_seq (List.map l ~f:inst)
+      | Seq (_, l) -> I_seq (List.map inst l)
       | Prim (_, "RENAME", [], _) -> I_rename
       | Prim (_, "FAILWITH", [], _) -> I_failwith
       | Prim (_, "IF", [ i_t; i_f ], _) -> I_if (inst i_t, inst i_f)
       | Prim (_, "LOOP", [ b ], _) -> I_loop (inst b)
       | Prim (_, "LOOP_LEFT", [ b ], _) -> I_loop_left (inst b)
       | Prim (_, "DIP", [ b ], _) -> I_dip (inst b)
-      | Prim (_, "DIP", [ Int (_, n); b ], _) ->
-          I_dip_n (Bigint.of_zarith_bigint n, inst b)
+      | Prim (_, "DIP", [ Int (_, n); b ], _) -> I_dip_n (n, inst b)
       | Prim (_, "EXEC", [], _) -> I_exec
       | Prim (_, "APPLY", [], _) -> I_apply
       | Prim (_, "DROP", [], _) -> I_drop
-      | Prim (_, "DROP", [ Int (_, n) ], _) ->
-          I_drop_n (Bigint.of_zarith_bigint n)
-      | Prim (_, "DUP", [], _) -> I_dup Bigint.one
+      | Prim (_, "DROP", [ Int (_, n) ], _) -> I_drop_n n
+      | Prim (_, "DUP", [], _) -> I_dup Z.one
       | Prim (_, "SWAP", [], _) -> I_swap
-      | Prim (_, "DIG", [ Int (_, n) ], _) -> I_dig (Bigint.of_zarith_bigint n)
-      | Prim (_, "DUG", [ Int (_, n) ], _) -> I_dug (Bigint.of_zarith_bigint n)
+      | Prim (_, "DIG", [ Int (_, n) ], _) -> I_dig n
+      | Prim (_, "DUG", [ Int (_, n) ], _) -> I_dug n
       | Prim (_, "PUSH", [ t; d ], _) ->
           let t = typ t in
           I_push (t, data t d)
@@ -234,8 +229,7 @@ let rec convert filename ast =
       | Prim (_, "CHECK_SIGNATURE", [], _) -> I_check_signature
       | Prim (_, "CAST", [ t ], _) -> I_cast (typ t)
       | Prim (_, "UNPAIR", [], _) -> I_unpair
-      | Prim (_, "UNPAIR", [ Int (_, n) ], _) ->
-          I_unpair_n (Bigint.of_zarith_bigint n)
+      | Prim (_, "UNPAIR", [ Int (_, n) ], _) -> I_unpair_n n
       | Prim (_, "NEVER", [], _) -> I_never
       | Prim (_, "SELF_ADDRESS", [], _) -> I_self_address
       | Prim (_, "VOTING_POWER", [], _) -> I_voting_power
@@ -249,15 +243,12 @@ let rec convert filename ast =
       | Prim (_, "READ_TICKET", [], _) -> I_read_ticket
       | Prim (_, "SPLIT_TICKET", [], _) -> I_split_ticket
       | Prim (_, "JOIN_TICKETS", [], _) -> I_join_tickets
-      | Prim (_, "DUP", [ Int (_, n) ], _) -> I_dup (Bigint.of_zarith_bigint n)
-      | Prim (_, "PAIR", [ Int (_, n) ], _) ->
-          I_pair_n (Bigint.of_zarith_bigint n)
-      | Prim (_, "GET", [ Int (_, n) ], _) ->
-          I_get_n (Bigint.of_zarith_bigint n)
-      | Prim (_, "UPDATE", [ Int (_, n) ], _) ->
-          I_update_n (Bigint.of_zarith_bigint n)
+      | Prim (_, "DUP", [ Int (_, n) ], _) -> I_dup n
+      | Prim (_, "PAIR", [ Int (_, n) ], _) -> I_pair_n n
+      | Prim (_, "GET", [ Int (_, n) ], _) -> I_get_n n
+      | Prim (_, "UPDATE", [ Int (_, n) ], _) -> I_update_n n
       | Prim (_, "SAPLING_EMPTY_STATE", [ Int (_, n) ], _) ->
-          I_sapling_empty_state (Bigint.of_zarith_bigint n)
+          I_sapling_empty_state n
       | Prim (_, "GET_AND_UPDATE", [], _) -> I_get_and_update
       | t ->
           error Format.str_formatter filename t;
@@ -269,28 +260,29 @@ let rec convert filename ast =
     | Prim (_, _, _, l) ->
         create
           ~location:(token_location filename token)
-          (i, List.map l ~f:get_annot)
+          (i, List.map get_annot l)
     | _ -> assert false
   in
 
   let parameter =
-    List.find_map ast ~f:(function
-      | Micheline.Prim (_, "parameter", [ t ], _) -> Some t
-      | _ -> None)
+    List.find_map
+      (function
+        | Micheline.Prim (_, "parameter", [ t ], _) -> Some t | _ -> None)
+      ast
   in
 
-  let param = typ (Option.value_exn parameter) in
+  let param = typ (Option.get_exn_or "" parameter) in
   let storage =
-    List.find_map ast ~f:(function
-      | Micheline.Prim (_, "storage", [ t ], _) -> Some t
-      | _ -> None)
+    List.find_map
+      (function Micheline.Prim (_, "storage", [ t ], _) -> Some t | _ -> None)
+      ast
   in
 
-  let storage = typ (Option.value_exn storage) in
+  let storage = typ (Option.get_exn_or "" storage) in
   let code =
-    List.find_map ast ~f:(function
-      | Micheline.Prim (_, "code", [ c ], _) -> Some c
-      | _ -> None)
+    List.find_map
+      (function Micheline.Prim (_, "code", [ c ], _) -> Some c | _ -> None)
+      ast
   in
-  let code = inst (Option.value_exn code) in
+  let code = inst (Option.get_exn_or "" code) in
   { code; param; storage }

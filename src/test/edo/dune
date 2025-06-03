@@ -1,8 +1,7 @@
 (test
  (name parsing)
  (libraries
-  core
-  core_unix.sys_unix
+  containers
   alcotest
   michelson-adt.common
   michelson-adt.edo

@@ -1,8 +1,8 @@
-open! Core
+open! Containers
 
 let () =
   let dir = "../../tests/edo/" in
-  let files = Sys_unix.readdir dir in
+  let files = Sys.readdir dir in
   let open Alcotest in
   let create_test file =
     let open Edo_parser.Parser in
@@ -13,10 +13,7 @@ let () =
       ()
     in
     let test_f () =
-      let pp () l =
-        Common_adt.Loc.pp Format.str_formatter l;
-        Format.flush_str_formatter ()
-      in
+      let pp ppf l = Common_adt.Loc.pp ppf l in
       try
         parse_f ();
         check pass "Ok" () ()
@@ -33,6 +30,6 @@ let () =
     in
     test_case file `Quick test_f
   in
-  let tests = Array.map files ~f:create_test in
+  let tests = Array.map create_test files in
   let tests = Array.to_list tests in
   run "parsing" [ ("parsing", tests) ]
